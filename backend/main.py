@@ -120,6 +120,7 @@ def setup_gemini_credentials():
         )
 
 @app.post("/api/analyze", response_model=AnalysisResponse)
+@app.post("/analyze", response_model=AnalysisResponse)
 async def analyze_scope(req: AnalysisRequest):
     setup_gemini_credentials()
 
@@ -188,12 +189,14 @@ async def global_exception_handler(request, exc):
 FRONTEND_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "index.html")
 
 @app.get("/")
+@app.get("/api")
 def serve_frontend():
     if os.path.exists(FRONTEND_FILE):
         return FileResponse(FRONTEND_FILE)
     return health_check()
 
 @app.get("/health")
+@app.get("/api/health")
 def health_check():
     has_key = bool(
         os.getenv("GEMINI_API_KEY", "").strip() or 
