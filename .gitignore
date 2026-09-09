@@ -1,0 +1,33 @@
+# Environment variables & API keys (CRITICAL)
+.env
+*.env
+backend/.env
+backend/*.env
+
+# Python caches & build artifacts
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# IDE / Editor configuration
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
