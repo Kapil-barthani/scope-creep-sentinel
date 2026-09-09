@@ -10,12 +10,16 @@ from main import app
 
 @app.middleware("http")
 async def normalize_path(request: Request, call_next):
-    path = request.scope.get("path", "")
-    for prefix in ["/api/index.py", "/api/index", "/api"]:
-        if path.startswith(prefix) and path != prefix:
-            request.scope["path"] = path[len(prefix):] or "/"
+    original = request.headers.get("x-matched-path") or request.headers.get("x-forwarded-uri")
+    if original:
+        path = original
+    else:
+        path = request.scope.get("path", "")
+
+    for prefix in ["/api/index.py", "/api/index"]:
+        if path.startswith(prefix):
+            path = path[len(prefix):] or "/"
             break
-        elif path == prefix:
-            request.scope["path"] = "/"
-            break
+
+    request.scope["path"] = path
     return await call_next(request)
