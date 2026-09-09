@@ -21,8 +21,7 @@ async def debug_endpoint(request: Request):
 @app.api_route("/{full_path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"])
 async def catch_all_debug(request: Request, full_path: str):
     return {
-        "caught_path": full_path,
+        "headers": dict(request.headers),
         "url_path": request.url.path,
-        "scope_path": request.scope.get("path"),
-        "method": request.method
+        "scope": {k: str(v) for k, v in request.scope.items() if k not in ["app", "router"]}
     }
