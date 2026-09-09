@@ -8,20 +8,11 @@ sys.path.insert(0, os.path.abspath(backend_dir))
 from fastapi import Request
 from main import app
 
-@app.api_route("/debug", methods=["GET", "POST"])
-@app.api_route("/api/debug", methods=["GET", "POST"])
-@app.api_route("/api/index.py/debug", methods=["GET", "POST"])
-async def debug_endpoint(request: Request):
-    return {
-        "url_path": request.url.path,
-        "scope_path": request.scope.get("path"),
-        "headers": {k: v for k, v in request.headers.items() if "auth" not in k.lower()}
-    }
-
-@app.api_route("/{full_path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"])
-async def catch_all_debug(request: Request, full_path: str):
-    return {
-        "headers": dict(request.headers),
-        "url_path": request.url.path,
-        "scope": {k: str(v) for k, v in request.scope.items() if k not in ["app", "router"]}
-    }
+@app.middleware("http")
+async def extract_vercel_path(request: Request, call_next):
+    real_path = request.query_params.get("__path")
+    if real_path:
+        while "//" in real_path:
+            real_path = real_path.replace("//", "/")
+        request.scope["path"] = real_path
+    return await call_next(request)
